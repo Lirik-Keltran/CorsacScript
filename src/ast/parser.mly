@@ -10,7 +10,7 @@
 %token <string> ATOM
 
 // + - * / = ; .
-%token PLUS MINUS MUL DIV EQ  SEMI DOT
+%token PLUS MINUS MUL DIV EQ  SEMI DOT COMMA
 
 // ( ) 
 %token LPAREN RPAREN
@@ -48,10 +48,16 @@ expr:
 ;
 
 simple_expr:
-    | id                    { Id $1 }
-    | number                { Number $1 }
-    | ATOM                  { Atom $1}
-    | LPAREN expr RPAREN    { $2 }
+    | id                                    { Id $1 }
+    | number                                { Number $1 }
+    | ATOM                                  { Atom $1}
+    | LPAREN expr RPAREN                    { $2 }
+    | LPAREN expr COMMA tuple_args RPAREN   { Tuple (Array.of_list ($2 :: $4)) }
+;
+
+tuple_args:
+    | expr COMMA tuple_args   { ($1 :: $3) }
+    | expr                    { ($1 :: []) }
 ;
 
 funccall_expr:

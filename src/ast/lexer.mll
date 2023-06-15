@@ -29,6 +29,7 @@ rule read =
   | "="               { EQ }
   | ";"               { SEMI }
   | "."               { DOT }
+  | ","               { COMMA }
   | id as word        { IDENT word }
   | atom as a         { ATOM a }
   | float as num      { FLOAT(float_of_string num) }

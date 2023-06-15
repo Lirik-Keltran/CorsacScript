@@ -5,3 +5,4 @@ a = 3;
 print a;
 t 2;
 print SomeAtom;
+print (1, 2, SomeAtom);

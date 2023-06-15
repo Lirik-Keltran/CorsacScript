@@ -8,9 +8,15 @@ and eval_expr (e, env) = match e with
   | FuncCall fc   -> (eval_funccall (fc, env) |> fst, env)
   | BinOp bop     -> eval_binop (bop, env)
   | Id id         -> eval_id (id, env)
+  | Tuple t       -> eval_tuple (t, env)
   | Number _      -> (e, env)
   | FuncOcaml _   -> (e, env)
   | Atom _        -> (e, env)
+
+and eval_tuple (t, env) =
+  let t' = Array.map (fun e -> eval_expr (e, env) |> fst ) t in 
+    (Tuple t', env)
+
 and eval_id (id, env) = 
  let e =  try Env.find id env
    with Not_found -> failwith ("Not found var: " ^ id)

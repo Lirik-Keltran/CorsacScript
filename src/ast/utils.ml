@@ -38,13 +38,15 @@ let rec print_expr = function
   | Number n            -> string_of_number n
   | FuncOcaml (name, _) -> " |system|{ name: " ^ name ^ " }"
   | Atom a              -> " |atom|{ Atom: " ^ a ^ " }"
+  | Tuple t             -> " |tuple| {" ^ (Array.fold_left (fun acc e -> acc ^ ", " ^ print_expr e) "" t) ^ "}"
 
-let print_val = function 
+let rec print_val = function 
   | Id id         -> id
   | Func _        -> "Func"
   | FuncCall _    -> "Call expr"
   | BinOp _       -> "Bin operation"
   | Number n      -> string_of_number n
   | FuncOcaml _   -> "Func"
-  | Atom a        -> a
+  | Atom a        -> "{" ^ a ^ "}"
   | Var _         -> failwith "impossible token"
+  | Tuple t       -> "(" ^ (Array.fold_left (fun acc e -> acc ^ " " ^ print_val e) "" t) ^ " )"
