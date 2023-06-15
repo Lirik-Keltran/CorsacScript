@@ -1,0 +1,40 @@
+function = arg1.arg2.arg3. arg1+arg2+arg3;
+
+function 1 2 3;
+//
+
+some = {
+    field = value;
+}
+
+pattern_Matching_Function = { field: value }. value+2;
+
+//
+
+f1 = arg. ...;
+f2 = arg. ...;
+f3 = arg. ...;
+
+some = arg |> f1 |> f2 |> f3;
+
+// 
+
+f = f. f 2;
+f arg. 2+2;
+
+call:
+    caller:
+        call:
+            caller:
+                call:
+                    caller: some
+                    arg: 1
+            arg: 2
+    arg: 3
+
+some 1 2 3
+
+expr12 expr3 expr4
+
+caller: expr12
+arg: expr3

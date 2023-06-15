@@ -1,0 +1,7 @@
+some = a. a + a * a;
+a = some 2;
+t = c. print a;
+a = 3;
+print a;
+t 2;
+print SomeAtom;

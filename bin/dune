@@ -1,0 +1,6 @@
+(executable
+ (public_name paw)
+ (name main)
+ (libraries core ast)
+ (preprocess
+  (pps ppx_deriving.show ppx_deriving.ord)))

@@ -1,0 +1,8 @@
+(library
+ (name ast))
+
+(menhir
+  (modules parser))
+
+(ocamllex
+  (modules lexer))
