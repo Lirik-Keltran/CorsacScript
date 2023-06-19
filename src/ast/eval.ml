@@ -59,6 +59,7 @@ and eval_funccall (fc, env) =
     match fc.caller with
     | FuncCall fc' -> eval_funccall (fc', env)
     | Id id -> (get_func id, env)
+    | Func _ -> (fc.caller, env)
     | _ -> failwith "never"
   in
   match e with
@@ -93,4 +94,4 @@ and call_func f arg env =
       let args = unite_tuple func_tuple arg_tuple in
       let env' = tuple_to_env args env |> merge_env env in
       eval_expr (f.body, env')
-  | _ -> failwith "todo"
+  | e1, e2 -> failwith (print_expr e1 ^ " - " ^ print_expr e2)

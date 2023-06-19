@@ -14,3 +14,7 @@ c = 3;
 tuple_var = (Atom, 2, c);
 
 print (destruc tuple_var);
+
+func_tuple = (a. a + 1, a. a * 2);
+
+((f1, f2). (print (f1 200), print (f2 200)))(func_tuple);
