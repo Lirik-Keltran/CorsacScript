@@ -9,4 +9,8 @@ print (1, 2, SomeAtom);
 
 destruc = (Atom, a, 3). a + a;
 
-print (destruc (Atom, 2, 3));
+c = 3;
+
+tuple_var = (Atom, 2, c);
+
+print (destruc tuple_var);

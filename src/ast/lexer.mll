@@ -9,7 +9,7 @@ let float = '-'? digit+ '.' digit+
 let low_letter = ['a'-'z']
 let up_letter = ['A'-'Z']
 let letter = ['a'-'z' 'A'-'Z']
-let id = low_letter (letter | digit)?+
+let id = (low_letter | '_') (letter | digit | '_')?+
 let atom = up_letter (letter | digit)?+
 
 
