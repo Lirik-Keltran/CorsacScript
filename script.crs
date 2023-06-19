@@ -6,3 +6,7 @@ print a;
 t 2;
 print SomeAtom;
 print (1, 2, SomeAtom);
+
+destruc = (Atom, a, 3). a + a;
+
+print (destruc (Atom, 2, 3));
