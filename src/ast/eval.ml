@@ -51,7 +51,7 @@ and eval_funccall (fc, env) =
   let get_func id =
     match Env.find_opt id env with
     | Some (Func f) -> Func f
-    | Some (FuncOcaml (n, f)) -> FuncOcaml (n, f)
+    | Some (FuncOcaml f) -> FuncOcaml f
     | Some _ -> failwith (id ^ " have a type other than function")
     | None -> failwith ("Not found function with name" ^ id)
   in
@@ -64,7 +64,7 @@ and eval_funccall (fc, env) =
   in
   match e with
   | Func f -> call_func f arg env'
-  | FuncOcaml (_, f) -> f arg env'
+  | FuncOcaml f -> f arg env'
   | _ -> failwith "extra argument is passed"
 
 and call_func f arg env =
@@ -82,16 +82,15 @@ and call_func f arg env =
             ("Atoms error: " ^ a_atom ^ " and " ^ f_atom ^ " is not equal")
     | e1, e2 -> failwith (print_expr e1 ^ " | " ^ print_expr e2)
   in
-  let tuple_to_env args env =
+  let tuple_to_env env args =
     Array.fold_left (fun env (f, a) -> expr_to_env a f env) env args
   in
-  match (f.arg_f, arg) with
-  | Id id, _ ->
-      let env' = Env.add id arg f.env |> merge_env env in
-      eval_expr (f.body, env')
-  | Tuple func_tuple, Tuple arg_tuple
-    when Array.length func_tuple = Array.length arg_tuple ->
-      let args = unite_tuple func_tuple arg_tuple in
-      let env' = tuple_to_env args env |> merge_env env in
-      eval_expr (f.body, env')
-  | e1, e2 -> failwith (print_expr e1 ^ " - " ^ print_expr e2)
+  let env' =
+    match (f.arg_f, arg) with
+    | Id id, _ -> Env.add id arg f.env
+    | Tuple func_tuple, Tuple arg_tuple
+      when Array.length func_tuple = Array.length arg_tuple ->
+        unite_tuple func_tuple arg_tuple |> tuple_to_env env
+    | e1, e2 -> failwith (print_expr e1 ^ " - " ^ print_expr e2)
+  in
+  eval_expr (f.body, env' |> merge_env env)

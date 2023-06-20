@@ -41,21 +41,22 @@ let string_of_number n =
 let rec print_expr = function
   | Id id -> id
   | Func f ->
-      " |fun|{ arg_name: " ^ print_expr f.arg_f ^ "; body" ^ print_expr f.body
+      "|fun|{ arg_name: " ^ print_expr f.arg_f ^ "; body" ^ print_expr f.body
       ^ " }"
   | FuncCall fc ->
-      " |call|{ caller: " ^ print_expr fc.caller ^ "; arg: " ^ print_expr fc.arg
+      "|call|{ caller: " ^ print_expr fc.caller ^ "; arg: " ^ print_expr fc.arg
       ^ " }"
   | BinOp (e1, _, e2) ->
-      " |binop|{ " ^ print_expr e1 ^ " OP " ^ print_expr e2 ^ " }"
-  | Var v -> " |var|{ name: " ^ v.name ^ "; value: " ^ print_expr v.value ^ " }"
-  | Number n -> string_of_number n
-  | FuncOcaml (name, _) -> " |system|{ name: " ^ name ^ " }"
-  | Atom a -> " |atom|{ Atom: " ^ a ^ " }"
+      "|binop|{ " ^ print_expr e1 ^ " OP " ^ print_expr e2 ^ " }"
+  | Var v -> "|var|{ name: " ^ v.name ^ "; value: " ^ print_expr v.value ^ " }"
+  | Number (Float n) -> "|float|" ^ string_of_float n
+  | Number (Int n) -> "|int|" ^ string_of_int n
+  | FuncOcaml _ -> "|system|{ system }"
+  | Atom a -> "|atom|{ Atom: " ^ a ^ " }"
   | Tuple t ->
       " |tuple| {"
-      ^ Array.fold_left (fun acc e -> acc ^ ", " ^ print_expr e) "" t
-      ^ "}"
+      ^ Array.fold_left (fun acc e -> acc ^ " " ^ print_expr e) "" t
+      ^ " }"
 
 let rec print_val = function
   | Id id -> id

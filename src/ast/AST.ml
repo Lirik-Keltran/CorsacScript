@@ -14,7 +14,7 @@ type expr =
   | Number of number
   | Atom of string
   | Tuple of expr array
-  | FuncOcaml of string * (expr -> expr Env.t -> expr * expr Env.t)
+  | FuncOcaml of (expr -> expr Env.t -> expr * expr Env.t)
 
 and binOp = expr * opType * expr
 and func = { arg_f : expr; body : expr; env : expr Env.t }
