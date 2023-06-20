@@ -70,7 +70,7 @@ vardecl:
 ;
 
 funcdecl:
-    | expr DOT expr { { arg_f = $1; body = $3; env = Env.empty; } }
+    | simple_expr DOT expr { { arg_f = $1; body = $3; env = Env.empty; } }
 ;
 
 binop:
