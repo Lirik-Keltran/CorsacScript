@@ -9,8 +9,8 @@
 %token <string> IDENT
 %token <string> ATOM
 
-// + - * / = ; .
-%token PLUS MINUS MUL DIV EQ  SEMI DOT COMMA
+// + - * / = ; . |
+%token PLUS MINUS MUL DIV EQ  SEMI DOT COMMA OR
 
 // ( ) 
 %token LPAREN RPAREN
@@ -36,7 +36,7 @@
 %%
 prog: command* EOF { $1 }
 
-
+// TODO: убрать из синтаксиса точку с запятой
 command: expr SEMI { $1 }
 
 expr:

@@ -7,34 +7,29 @@ some = {
     field = value;
 }
 
-pattern_Matching_Function = { field: value }. value+2;
+destuct_function = { field: value }. value+2;
 
-//
+some = if ... then ... else ... ;
+some = ... ? ... ? ... ? ... : ...;
+
+some = .
+    | 0 = 0
+    | 1 = 1
+    | 2 = 2
+    | n = n + 1
+;
+
+|| && > < == != >= <=
 
 f1 = arg. ...;
 f2 = arg. ...;
 f3 = arg. ...;
 
-some = arg |> f1 |> f2 |> f3;
+some = arg -> f1 -> f2 -> f3;
 
 // 
 
 f = f. f 2;
 f arg. 2+2;
 
-call:
-    caller:
-        call:
-            caller:
-                call:
-                    caller: some
-                    arg: 1
-            arg: 2
-    arg: 3
-
 some 1 2 3
-
-expr12 expr3 expr4
-
-caller: expr12
-arg: expr3

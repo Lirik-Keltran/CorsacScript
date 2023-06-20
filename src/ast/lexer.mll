@@ -22,6 +22,7 @@ rule read =
   | "/"               { DIV }
   | "("               { LPAREN }
   | ")"               { RPAREN }
+  | "|"               { OR }
   (* | "{"               { LBRACE }
   | "}"               { RBRACE }
   | "["               { LBRACKET }
