@@ -1,11 +1,3 @@
-some = v. (Some, v);
-none = None;
+rec = n. n == 0 ? 0 : n + (rec n - 1);
 
-map = f.o. o == (Some, _) ? some (f o) : o ;
-
-s = some 2;
-n = none;
-
-addTen = map ((Some, a). a + 10);
-print (addTen s);
-print (addTen n);
+print (rec 1000000);
