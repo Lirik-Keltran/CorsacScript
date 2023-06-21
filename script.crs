@@ -1,26 +1,11 @@
-some = a. a + a * a;
-a = some 2;
-t = c. print a;
-a = 3;
-print a;
-t 2;
-print SomeAtom;
-print (1, 2, SomeAtom);
+some = v. (Some, v);
+none = None;
 
-destruc = (Atom, a, 3). a + a;
+map = f.o. o == (Some, _) ? some (f o) : o ;
 
-c = 3;
+s = some 2;
+n = none;
 
-tuple_var = (Atom, 2, c);
-
-print (destruc tuple_var);
-
-func_tuple = (f1, f2). f1 1 + f2 1;
-
-(f1. print (f1 200))(a. a + 1);
-
-some = func_tuple (a.a*100, a.a*200);
-
-debug_print (print 2);
-
-debug_print some;
+addTen = map ((Some, a). a + 10);
+print (addTen s);
+print (addTen n);

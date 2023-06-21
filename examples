@@ -1,3 +1,15 @@
+// Структурные паттерны на этапе компиляции
+
+
+!func_stuct_pattern (a, b) -> a > 10 -> a > b -> b < 10;
+func_stuct_pattern = (a, b). a + b;
+
+to_either = f. exeption f
+
+function = a. a > 10 ? 
+
+/// Добавить сбор информации об идентификаторах
+
 function = arg1.arg2.arg3. arg1+arg2+arg3;
 
 function 1 2 3;

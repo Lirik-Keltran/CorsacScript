@@ -9,8 +9,30 @@
 %token <string> IDENT
 %token <string> ATOM
 
-// + - * / = ; . |
-%token PLUS MINUS MUL DIV EQ  SEMI DOT COMMA OR
+// + 
+%token PLUS 
+// -
+%token MINUS  
+// *
+%token MUL  
+// /
+%token DIV  
+// =
+%token EQ   
+// ;
+%token SEMI  
+// .
+%token DOT  
+// ,
+%token COMMA  
+// ?
+%token IF  
+// :
+%token COLON
+// ==
+%token COMPARE
+// _
+%token UNKNOWN
 
 // ( ) 
 %token LPAREN RPAREN
@@ -26,6 +48,7 @@
 // задаем приоритет операций
 // Фиктивный токен, для того чтобы задавать приоритет операций
 // %nonassoc BELOW_SHARP
+%left COMPARE
 %left PLUS MINUS
 %left MUL DIV 
 // %nonassoc UMINUS
@@ -40,10 +63,10 @@ prog: command* EOF { $1 }
 command: expr SEMI { $1 }
 
 expr:
-    | binop                 { BinOp $1 }
     | funcdecl              { Func $1 }
     | vardecl               { Var $1 }
     | funccall_expr         { $1 }
+    | ifexpr                { $1 }
     | simple_expr           { $1 }
 ;
 
@@ -51,6 +74,8 @@ simple_expr:
     | id                                    { Id $1 }
     | number                                { Number $1 }
     | ATOM                                  { Atom $1}
+    | UNKNOWN                               { Unknown }
+    | binop                                 { BinOp $1 }
     | LPAREN expr RPAREN                    { $2 }
     | LPAREN expr COMMA tuple_args RPAREN   { Tuple (Array.of_list ($2 :: $4)) }
 ;
@@ -66,22 +91,27 @@ funccall_expr:
 ;
 
 vardecl:
-    | IDENT EQ expr { { name = $1; value = $3; } }
+    | simple_expr EQ expr { { name = $1; value = $3; } }
 ;
 
 funcdecl:
     | simple_expr DOT expr { { arg_f = $1; body = $3; env = Env.empty; } }
 ;
 
+ifexpr:
+    | simple_expr IF expr COLON expr { If ($1, $3, $5) }
+;
+
 binop:
-    | expr op expr { ($1, $2, $3) }
+    | simple_expr op simple_expr { ($1, $2, $3) }
 ;
 
 %inline op:
-    | PLUS  { Sum }
-    | DIV   { Div }
-    | MINUS { Sub }
-    | MUL   { Mul }
+    | PLUS      { Sum }
+    | DIV       { Div }
+    | MINUS     { Sub }
+    | MUL       { Mul }
+    | COMPARE   { Comp }
 ;
 
 id:
