@@ -1,1 +1,1 @@
-type op_code = Add | Sub | JMP | Push | Goto | EQ
+type op_code = Push | PushVar | SetVar | Add | Sub | EQ | JMP | Goto | End | Call | Ret
