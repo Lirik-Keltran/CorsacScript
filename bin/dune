@@ -9,6 +9,6 @@
 (executable
  (public_name paw)
  (name main)
- (libraries core ast vm compiler)
+ (libraries core ast vm)
  (preprocess
   (pps ppx_deriving.show ppx_deriving.ord)))
