@@ -19,6 +19,8 @@ let create_vm program =
     stack_cursor = 0;
   }
 
+let print_vm_heap vm = Stack.iter (fun n -> Int32.to_string n |> print_endline) vm.heap
+
 let run_vm vm =
   let get_command vm =
     Array.get vm.stack_command (Int32.to_int vm.command_cursor)
@@ -60,8 +62,7 @@ let run_vm vm =
     | Call ->
         let arg = Stack.pop vm.heap in
         let _ = Array.set vm.stack (Int32.to_int command.arg) arg in
-        let _ = Stack.push vm.command_cursor vm.heap in
-        failwith "Todo"
+        Stack.push vm.command_cursor vm.heap
     | Ret ->
         let adress = Stack.pop vm.heap in
         vm.command_cursor <- adress
@@ -80,3 +81,7 @@ let sub = { op = Add; arg = 0l }
 let jmp arg = { op = JMP; arg }
 let goto arg = { op = Goto; arg }
 let eq = { op = EQ; arg = 0l }
+
+let program = [|push 3l; push 4l; add; push 5l|]
+
+let virt = create_vm program
