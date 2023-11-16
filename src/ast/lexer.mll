@@ -25,6 +25,7 @@ rule read =
   | ":"               { COLON }
   | "?"               { IF }
   | "<>"              { DESTRUCT }
+  | "|>"              { PIPE }
   (* | "|"               { OR } *)
   (* | "{"               { LBRACE }
   | "}"               { RBRACE }

@@ -34,6 +34,9 @@
 // _
 %token UNKNOWN
 
+// |>
+%token PIPE
+
 // ( )
 %token LPAREN RPAREN
 
@@ -53,7 +56,7 @@
 // задаем приоритет операций
 // Фиктивный токен, для того чтобы задавать приоритет операций
 // %nonassoc BELOW_SHARP
-%left COMPARE
+%left COMPARE PIPE
 %left PLUS MINUS
 %left MUL DIV DESTRUCT
 // %nonassoc UMINUS
@@ -68,7 +71,7 @@ prog: command* EOF { $1 }
 command: expr SEMI { $1 }
 
 expr:
-    | funcdecl              { Func $1 }
+    | funcdecl              { $1 }
     | vardecl               { Var $1 }
     | funccall_expr         { $1 }
     | ifexpr                { $1 }
@@ -76,12 +79,13 @@ expr:
 ;
 
 simple_expr:
-    | id                                    { Id $1 }
-    | number                                { Number $1 }
+    | id                                    { $1 }
+    | number                                { $1 }
     | ATOM                                  { Atom $1}
     | UNKNOWN                               { Unknown }
+    | pipe                                  { $1 }
     | destruct                              { $1 }
-    | binop                                 { BinOp $1 }
+    | binop                                 { $1 }
     | LPAREN expr RPAREN                    { $2 }
     | LPAREN expr COMMA tuple_args RPAREN   { Tuple (Array.of_list ($2 :: $4)) }
 ;
@@ -101,7 +105,7 @@ vardecl:
 ;
 
 funcdecl:
-    | simple_expr DOT expr { { arg_f = $1; body = $3; env = Env.empty; } }
+    | simple_expr DOT expr { Func { arg_f = $1; body = $3; env = Env.empty; } }
 ;
 
 ifexpr:
@@ -109,7 +113,11 @@ ifexpr:
 ;
 
 binop:
-    | simple_expr op simple_expr { ($1, $2, $3) }
+    | simple_expr op simple_expr { BinOp ($1, $2, $3) }
+;
+
+pipe:
+    | simple_expr PIPE simple_expr { FuncCall { caller = $3; arg = $1; }}
 ;
 
 destruct:
@@ -125,10 +133,10 @@ destruct:
 ;
 
 id:
-    | IDENT { $1 }
+    | IDENT { Id $1 }
 ;
 
 number:
-    | INT { Int $1 }
-    | FLOAT { Float $1 }
+    | INT { Number (Int $1) }
+    | FLOAT { Number  (Float $1) }
 ;

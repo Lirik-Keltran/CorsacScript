@@ -23,3 +23,19 @@ and binOp = expr * opType * expr
 and func = { arg_f : expr; body : expr; env : expr Env.t }
 and funccall = { caller : expr; arg : expr }
 and var = { name : expr; value : expr }
+
+
+(*
+func
+arg_f
+
+f2 . f1 = arg. f2(f1 arg);
+
+{
+  arg_f: Id arg,
+  body: funcall { caller: f2, arg: funccall { caller: f1, arg: arg}  },
+  env,
+}
+
+{ arg_f = Id "arg", body = { caller = Id f2, arg: { caller: Id f1, arg: Id "arg" }} }
+*)
