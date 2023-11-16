@@ -17,6 +17,7 @@ type expr =
   | If of expr * expr * expr
   | Unknown
   | FuncOcaml of (expr -> expr Env.t -> expr * expr Env.t)
+  | Dest of expr * expr
 
 and binOp = expr * opType * expr
 and func = { arg_f : expr; body : expr; env : expr Env.t }

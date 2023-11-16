@@ -2,31 +2,31 @@
     open AST
 %}
 
-%token <int> INT 
+%token <int> INT
 %token <float> FLOAT
 
 // {string}
 %token <string> IDENT
 %token <string> ATOM
 
-// + 
-%token PLUS 
+// +
+%token PLUS
 // -
-%token MINUS  
+%token MINUS
 // *
-%token MUL  
+%token MUL
 // /
-%token DIV  
+%token DIV
 // =
-%token EQ   
+%token EQ
 // ;
-%token SEMI  
+%token SEMI
 // .
-%token DOT  
+%token DOT
 // ,
-%token COMMA  
+%token COMMA
 // ?
-%token IF  
+%token IF
 // :
 %token COLON
 // ==
@@ -34,14 +34,19 @@
 // _
 %token UNKNOWN
 
-// ( ) 
+// ( )
 %token LPAREN RPAREN
 
-// { } 
+// <>
+%token DESTRUCT
+
+// { }
 // %token LBRACE RBRACE
 
 // [ ]
 // %token LBRACKET RBRACKET
+
+
 
 %token EOF
 
@@ -50,10 +55,10 @@
 // %nonassoc BELOW_SHARP
 %left COMPARE
 %left PLUS MINUS
-%left MUL DIV 
+%left MUL DIV DESTRUCT
 // %nonassoc UMINUS
 
-// функция начала парсинга 
+// функция начала парсинга
 %start prog
 %type <AST.expr list> prog
 %%
@@ -75,6 +80,7 @@ simple_expr:
     | number                                { Number $1 }
     | ATOM                                  { Atom $1}
     | UNKNOWN                               { Unknown }
+    | destruct                              { $1 }
     | binop                                 { BinOp $1 }
     | LPAREN expr RPAREN                    { $2 }
     | LPAREN expr COMMA tuple_args RPAREN   { Tuple (Array.of_list ($2 :: $4)) }
@@ -106,6 +112,10 @@ binop:
     | simple_expr op simple_expr { ($1, $2, $3) }
 ;
 
+destruct:
+    | simple_expr DESTRUCT simple_expr { Dest ($1, $3) }
+;
+
 %inline op:
     | PLUS      { Sum }
     | DIV       { Div }
@@ -118,7 +128,7 @@ id:
     | IDENT { $1 }
 ;
 
-number: 
+number:
     | INT { Int $1 }
     | FLOAT { Float $1 }
 ;

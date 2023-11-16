@@ -1,3 +1,25 @@
+some = v. (Some, v);
+none = None;
+
+some = v. (Some, v);
+none = None;
+
+map = f.o. o <> (Some, v) ? some (f v) : none;
+
 rec = n. n == 0 ? 0 : n + (rec n - 1);
 
-print (rec 100000);
+compose = f.s.a. f(s a);
+
+mapRec = map rec;
+
+mapPrint = map print;
+
+c = mapPrint . mapRec;
+
+c (some 10);
+
+b = (1, (Some, (5, None)));
+
+(1, (Some, (v, None))) <> b;
+
+print v;

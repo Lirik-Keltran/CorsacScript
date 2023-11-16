@@ -6,7 +6,7 @@ func_stuct_pattern = (a, b). a + b;
 
 to_either = f. exeption f
 
-function = a. a > 10 ? 
+function = a. a > 10 ?
 
 /// Добавить сбор информации об идентификаторах
 
@@ -39,9 +39,50 @@ f3 = arg. ...;
 
 some = arg -> f1 -> f2 -> f3;
 
-// 
+//
 
 f = f. f 2;
 f arg. 2+2;
 
 some 1 2 3
+
+@ #{
+  ...($fieldNames: $values),
+} = list Create $createFunc $fieldNames |> List Merge $fieldNames ([name, value].idx. $createFunc (l. list Get idx))
+
+obj = #{
+  some: 2,
+  t: 3
+}
+
+some obj
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

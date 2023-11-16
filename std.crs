@@ -1,3 +1,22 @@
 some = v. (Some, v);
 none = None;
 
+some = v. (Some, v);
+none = None;
+
+getSome = (Some, v). v;
+getSome = None. none;
+
+map = f.o. o == (Some, _) ? (Some, f (getSome o)) : none;
+
+rec = n. n == 0 ? 0 : n + (rec n - 1);
+
+compose = f.s.a. f(s a);
+
+mapRec = map rec;
+
+mapPrint = map print;
+
+c = compose mapPrint mapRec;
+
+

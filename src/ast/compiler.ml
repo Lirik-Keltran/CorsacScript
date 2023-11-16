@@ -13,6 +13,7 @@ let rec compile = function
   | Atom a -> compile_atom a
   | Unknown -> ""
   | If (cond, e1, e2) -> compile_if (cond, e1, e2)
+  | Dest (e1, e2) ->  compile_dest (e1, e2)
 
 and compile_var _ = failwith "TODO"
 and compile_func _ = failwith "TODO"
@@ -22,3 +23,4 @@ and compile_id _ = failwith "TODO"
 and compile_tuple _ = failwith "TODO"
 and compile_atom _ = failwith "TODO"
 and compile_if _ = failwith "TODO"
+and compile_dest _ = failwith "TODO"

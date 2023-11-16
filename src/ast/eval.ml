@@ -2,7 +2,7 @@ open AST
 open Utils
 
 let rec eval list_e env =
-  List.fold_left (fun acc e -> snd (eval_expr (e, acc))) env list_e
+  List.fold_left (fun acc e -> eval_expr (e, acc) |> snd) env list_e
 
 and eval_expr (e, env) =
   match e with
@@ -14,11 +14,12 @@ and eval_expr (e, env) =
   | Tuple t -> eval_tuple (t, env)
   | Number _ | FuncOcaml _ | Atom _ | Unknown -> (e, env)
   | If (cond, e1, e2) -> eval_if ((cond, e1, e2), env)
+  | Dest (e1, e2) -> eval_dest((e1, e2), env)
 
 and eval_if ((cond, e1, e2), env) =
-  let cond' = eval_expr (cond, env) |> fst in
+  let (cond', env') = eval_expr (cond, env) in
   let result = if compare_expr cond' a_true then e1 else e2 in
-  eval_expr (result, env)
+  eval_expr (result, env')
 
 and eval_tuple (t, env) =
   let t' = Array.map (fun e -> eval_expr (e, env) |> fst) t in
@@ -49,7 +50,6 @@ and eval_func (f, env) =
   let env' = env in
   let f' = { f with env = env' } in
   (Func f', env)
-
 and eval_binop ((e1, op, e2), env) =
   let eval_operand e = eval_expr (e, env) |> fst in
   let print l r = ": " ^ print_expr l ^ " | " ^ print_expr r in
@@ -91,13 +91,14 @@ and call_func f arg env =
     | Tuple func_tuple, Tuple arg_tuple
       when Array.length func_tuple = Array.length arg_tuple ->
         unite_tuple func_tuple arg_tuple |> tuple_to_env env
-    | e1, e2 -> failwith (print_expr e1 ^ " - " ^ print_expr e2)
+    | Atom a1, Atom a2 when a1 = a2 -> env
+    | e1, e2 -> failwith ("call_func " ^ print_expr e1 ^ " - " ^ print_expr e2)
   in
   eval_expr (f.body, env' |> merge_env env)
 
-and expr_to_env arg func env =
-  match (arg, func) with
-  | a_expr, Id f_id -> Env.add f_id (eval_expr (a_expr, env) |> fst) env
+and expr_to_env e1 e2 env =
+  match (e1, e2) with
+  | e, Id id | Id id, e -> eval_var ({ name = Id id; value = e }, env) |> snd
   | Number a_num, Number f_num when compare_numbers a_num f_num -> env
   | Atom a_atom, Atom f_atom ->
       if a_atom = f_atom then env
@@ -107,4 +108,37 @@ and expr_to_env arg func env =
   | e1, e2 -> failwith (print_expr e1 ^ " | " ^ print_expr e2)
 
 and tuple_to_env env args =
-  Array.fold_left (fun env (f, a) -> expr_to_env a f env) env args
+  Array.fold_left (fun env' (f, a) -> expr_to_env a f env') env args
+
+and eval_dest ((e1, e2), env) = match (e1, e2) with
+  | Tuple t1, Tuple t2 ->
+      if Array.length t1 = Array.length t2 then
+        let res = unite_tuple t1 t2 in
+        let isSimular = Array.fold_left (fun acc (t1, t2) -> acc && expr_is_simular t1 t2) true res
+        in
+          if isSimular
+            then (a_true, tuple_to_env env res)
+            else (a_false, env)
+      else
+        (a_false, env)
+  | Id id, e | e, Id id ->
+    let v = eval_id (id, env) |> fst in
+    eval_dest ((v, e), env)
+  | _, _ -> (a_false, env)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
