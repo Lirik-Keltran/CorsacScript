@@ -29,8 +29,8 @@
 %token IF
 // :
 %token COLON
-// ==
-%token COMPARE
+
+%token COMPARE MORE LESS LESSEQ MOREEQ
 // _
 %token UNKNOWN
 
@@ -43,22 +43,25 @@
 // <>
 %token DESTRUCT
 
+// $
+%token COMPOSE
+
 // { }
 // %token LBRACE RBRACE
 
 // [ ]
 // %token LBRACKET RBRACKET
 
-
-
 %token EOF
 
 // задаем приоритет операций
 // Фиктивный токен, для того чтобы задавать приоритет операций
 // %nonassoc BELOW_SHARP
-%left COMPARE PIPE
+%right COMPOSE
+%left COMPARE MORE LESS LESSEQ MOREEQ
+%left PIPE
 %left PLUS MINUS
-%left MUL DIV DESTRUCT
+%left MUL DIV
 // %nonassoc UMINUS
 
 // функция начала парсинга
@@ -71,37 +74,49 @@ prog: command* EOF { $1 }
 command: expr SEMI { $1 }
 
 expr:
+    | vardecl               { $1 }
+    | func_expr           { $1 }
+;
+
+func_expr:
+    | pipe                  { $1 }
+    | compose               { $1 }
     | funcdecl              { $1 }
-    | vardecl               { Var $1 }
     | funccall_expr         { $1 }
     | ifexpr                { $1 }
+    | destruct              { $1 }
     | simple_expr           { $1 }
 ;
 
 simple_expr:
+    | binop                                 { $1 }
     | id                                    { $1 }
     | number                                { $1 }
     | ATOM                                  { Atom $1}
     | UNKNOWN                               { Unknown }
-    | pipe                                  { $1 }
-    | destruct                              { $1 }
-    | binop                                 { $1 }
     | LPAREN expr RPAREN                    { $2 }
-    | LPAREN expr COMMA tuple_args RPAREN   { Tuple (Array.of_list ($2 :: $4)) }
+    | tuple                                 { $1 }
+;
+
+tuple:
+    | LPAREN func_expr COMMA tuple_args RPAREN   { Tuple (Array.of_list ($2 :: $4)) }
 ;
 
 tuple_args:
-    | expr COMMA tuple_args   { ($1 :: $3) }
-    | expr                    { ($1 :: []) }
+    | func_expr COMMA tuple_args   { ($1 :: $3) }
+    | func_expr                    { ($1 :: []) }
 ;
 
 funccall_expr:
-    | funccall_expr simple_expr { FuncCall { caller = $1; arg = $2; } }
+    | funccall_id simple_expr { FuncCall { caller = $1; arg = $2; } }
+;
+
+funccall_id:
     | simple_expr               { $1 }
 ;
 
 vardecl:
-    | simple_expr EQ expr { { name = $1; value = $3; } }
+    | id EQ expr { Var { name = $1; value = $3; } }
 ;
 
 funcdecl:
@@ -109,7 +124,7 @@ funcdecl:
 ;
 
 ifexpr:
-    | simple_expr IF expr COLON expr { If ($1, $3, $5) }
+    | func_expr IF expr COLON expr { If ($1, $3, $5) }
 ;
 
 binop:
@@ -117,11 +132,28 @@ binop:
 ;
 
 pipe:
-    | simple_expr PIPE simple_expr { FuncCall { caller = $3; arg = $1; }}
+    | func_expr PIPE func_expr { FuncCall { caller = $3; arg = $1; }}
 ;
 
 destruct:
     | simple_expr DESTRUCT simple_expr { Dest ($1, $3) }
+;
+
+compose:
+    | func_expr COMPOSE func_expr
+        {
+            Func {
+                arg_f = Id "arg";
+                body = FuncCall {
+                    caller = $1;
+                    arg = FuncCall {
+                        caller = $3;
+                        arg = Id "arg";
+                    };
+                };
+                env = Env.empty;
+            }
+        }
 ;
 
 %inline op:
@@ -130,6 +162,10 @@ destruct:
     | MINUS     { Sub }
     | MUL       { Mul }
     | COMPARE   { Comp }
+    | LESSEQ    { LessEq }
+    | MOREEQ    { MoreEq }
+    | MORE      { More }
+    | LESS      { Less }
 ;
 
 id:

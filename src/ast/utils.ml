@@ -33,12 +33,41 @@ let div_number n1 n2 =
   | Int f1, Float f2 -> Float (float_of_int f1 /. f2)
   | Int f1, Int f2 -> Int (f1 / f2)
 
-let compare_numbers n1 n2 =
-  match (n1, n2) with
+let (#=) (l: number) (r: number) =
+  match (l, r) with
   | Float f1, Float f2 -> f1 = f2
   | Float f1, Int f2 -> f1 = float_of_int f2
   | Int f1, Float f2 -> float_of_int f1 = f2
   | Int f1, Int f2 -> f1 = f2
+
+
+let (#<) (l: number) (r: number) =
+  match (l, r) with
+  | Float f1, Float f2 -> f1 < f2
+  | Float f1, Int f2 -> f1 < float_of_int f2
+  | Int f1, Float f2 -> float_of_int f1 < f2
+  | Int f1, Int f2 -> f1 < f2
+
+let (#>) (l: number) (r: number) =
+  match (l, r) with
+  | Float f1, Float f2 -> f1 > f2
+  | Float f1, Int f2 -> f1 > float_of_int f2
+  | Int f1, Float f2 -> float_of_int f1 > f2
+  | Int f1, Int f2 -> f1 > f2
+
+let (#<=) (l: number) (r: number) =
+  match (l, r) with
+  | Float f1, Float f2 -> f1 <= f2
+  | Float f1, Int f2 -> f1 <= float_of_int f2
+  | Int f1, Float f2 -> float_of_int f1 <= f2
+  | Int f1, Int f2 -> f1 <= f2
+
+let (#>=) (l: number) (r: number) =
+  match (l, r) with
+  | Float f1, Float f2 -> f1 >= f2
+  | Float f1, Int f2 -> f1 >= float_of_int f2
+  | Int f1, Float f2 -> float_of_int f1 >= f2
+  | Int f1, Int f2 -> f1 >= f2
 
 let string_of_number n =
   match n with Float f -> string_of_float f | Int i -> string_of_int i
@@ -96,7 +125,7 @@ let rec compare_expr e1 e2 =
         Array.fold_left
           (fun acc (e1, e2) -> acc && compare_expr e1 e2)
           true united_tuple
-  | Number n1, Number n2 -> compare_numbers n1 n2
+  | Number n1, Number n2 -> n1 #= n2
   | Atom a1, Atom a2 -> a1 = a2
   | _, Unknown | Unknown, _ -> true
   | _ -> false

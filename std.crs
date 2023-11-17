@@ -20,3 +20,18 @@ mapPrint = map print;
 c = compose mapPrint mapRec;
 
 
+option = t.
+  | Map   : f.o. o <> (Some, v) ? option Some (f v) : None
+  | Bind  : f.o. o <> (Some, v) ? f v : e
+  | Some  : v. (Some, v)
+  | None  : None
+  | _     : NotRealized
+;
+
+either = t.
+  | Map   : f.e. e <> (Right, v) ? either Right (f v) : e
+  | Bind  : f.e. e <> (Right, v) ? f v : e
+  | Left  : v. (Left v)
+  | Right : v. (Right v)
+  | _     : NotRealized
+;

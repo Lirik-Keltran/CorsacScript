@@ -1,8 +1,12 @@
 {
   open Parser
+
+
+  exception SyntaxError of string
 }
 
-let white = [' ' '\t' '\n']+
+let white = [' ' '\t']+
+let new_line = '\n'
 let digit = ['0'-'9']
 let int = '-'? digit+
 let float = '-'? digit+ '.' digit+
@@ -12,9 +16,9 @@ let letter = ['a'-'z' 'A'-'Z']
 let id = (low_letter) (letter | digit | '_')*
 let atom = up_letter (letter | digit)+
 
-
 rule read =
   parse
+  | new_line          { Lexing.new_line lexbuf; read lexbuf }
   | white             { read lexbuf }
   | "*"               { MUL }
   | "+"               { PLUS }
@@ -26,11 +30,11 @@ rule read =
   | "?"               { IF }
   | "<>"              { DESTRUCT }
   | "|>"              { PIPE }
-  (* | "|"               { OR } *)
-  (* | "{"               { LBRACE }
-  | "}"               { RBRACE }
-  | "["               { LBRACKET }
-  | "]"               { RBRACKET } *)
+  | "$"               { COMPOSE }
+  | ">"               { MORE }
+  | "<"               { LESS }
+  | "<="              { LESSEQ }
+  | ">="              { MOREEQ }
   | "="               { EQ }
   | "=="              { COMPARE }
   | ";"               { SEMI }
@@ -42,3 +46,4 @@ rule read =
   | int as num        { INT (int_of_string num) }
   | "_"               { UNKNOWN }
   | eof               { EOF }
+  | _                 { raise (SyntaxError ("Illegal string character: " ^ Lexing.lexeme lexbuf)) }

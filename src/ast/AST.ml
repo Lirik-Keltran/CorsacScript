@@ -3,7 +3,7 @@ module Env = Map.Make (String)
 let merge_env env1 env2 = Env.union (fun _ _ e -> Some e) env1 env2
 
 type number = Float of float | Int of int
-type opType = Sum | Div | Sub | Mul | Comp
+type opType = Sum | Div | Sub | Mul | Comp | More | Less | LessEq | MoreEq
 
 type expr =
   | Var of var
@@ -24,18 +24,6 @@ and func = { arg_f : expr; body : expr; env : expr Env.t }
 and funccall = { caller : expr; arg : expr }
 and var = { name : expr; value : expr }
 
-
 (*
-func
-arg_f
-
-f2 . f1 = arg. f2(f1 arg);
-
-{
-  arg_f: Id arg,
-  body: funcall { caller: f2, arg: funccall { caller: f1, arg: arg}  },
-  env,
-}
-
-{ arg_f = Id "arg", body = { caller = Id f2, arg: { caller: Id f1, arg: Id "arg" }} }
+c = mapPrint $ mapRec $ some;
 *)

@@ -6,6 +6,8 @@ none = None;
 
 map = f.o. o <> (Some, v) ? some (f v) : none;
 
+condition = c.v. (c v) ? some v : none;
+
 rec = n. n == 0 ? 0 : n + (rec n - 1);
 
 compose = f.s.a. f(s a);
@@ -14,11 +16,9 @@ mapRec = map rec;
 
 mapPrint = map print;
 
-c = compose mapPrint mapRec;
+c = mapPrint $ map (n. n == 0 ? Mda : n) $ mapRec $ condition (n. n >= 0);
 
-some 10 |> print;
-
-b = (1, (Some, (5, None)));
-
-(1, (Some, (v, None))) <> b;
+10 |> c;
+4 |> c;
+0 |> c;
 

@@ -58,6 +58,10 @@ and eval_binop ((e1, op, e2), env) =
   | Number n1, Sub, Number n2 -> (Number (sub_number n1 n2), env)
   | Number n1, Mul, Number n2 -> (Number (mul_number n1 n2), env)
   | Number n1, Div, Number n2 -> (Number (div_number n1 n2), env)
+  | Number n1, More, Number n2    -> ((n1 #> n2) |> bool_to_abool, env)
+  | Number n1, MoreEq, Number n2  -> ((n1 #>= n2) |> bool_to_abool, env)
+  | Number n1, Less, Number n2    -> ((n1 #< n2) |> bool_to_abool, env)
+  | Number n1, LessEq, Number n2  -> ((n1 #<= n2) |> bool_to_abool, env)
   | e1, Comp, e2 ->
       let result = if compare_expr e1 e2 then a_true else a_false in
       (result, env)
@@ -99,7 +103,7 @@ and call_func f arg env =
 and expr_to_env e1 e2 env =
   match (e1, e2) with
   | e, Id id | Id id, e -> eval_var ({ name = Id id; value = e }, env) |> snd
-  | Number a_num, Number f_num when compare_numbers a_num f_num -> env
+  | Number a_num, Number f_num when a_num #= f_num -> env
   | Atom a_atom, Atom f_atom ->
       if a_atom = f_atom then env
       else
