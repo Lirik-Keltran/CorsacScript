@@ -108,11 +108,8 @@ tuple_args:
 ;
 
 funccall_expr:
-    | funccall_id simple_expr { FuncCall { caller = $1; arg = $2; } }
-;
-
-funccall_id:
     | simple_expr               { $1 }
+    | funccall_expr simple_expr { FuncCall { caller = $1; arg = $2; } }
 ;
 
 vardecl:

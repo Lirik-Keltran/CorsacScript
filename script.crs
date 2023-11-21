@@ -22,3 +22,9 @@ c = mapPrint $ map (n. n == 0 ? Mda : n) $ mapRec $ condition (n. n >= 0);
 4 |> c;
 0 |> c;
 
+
+declare Component One (Int);
+declare System DrawSystem (One) (x. x + 1);
+
+startTest 60;
+
