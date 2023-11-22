@@ -19,7 +19,6 @@ mapPrint = map print;
 
 c = compose mapPrint mapRec;
 
-
 option = t.
   | Map   : f.o. o <> (Some, v) ? option Some (f v) : None
   | Bind  : f.o. o <> (Some, v) ? f v : e
@@ -35,3 +34,30 @@ either = t.
   | Right : v. (Right v)
   | _     : NotRealized
 ;
+
+
+
+declare Component Vector2 (Int, Int); // Обьявление компонента
+declare Component Position (Vector2);
+
+declare System DrawSystem (One) (set.x. set One x + 1); // Обьявление система
+
+declare Scene Scene1 (DrawSystem);
+
+declare Constant GravityConst Int 10;
+declare Scene1 GravitSystem (Position, GravityConst) (set.(x, y).grav. set Position (x, y - grav));
+
+lens = lens
+
+query = select (Person, Marcus) where ();
+
+declare Scene GravitySystem query (set.(x, y).grav. set Position (x, y - grav));
+
+startScene Scene1 Framerate 60;
+
+
+
+
+
+
+

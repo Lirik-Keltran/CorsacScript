@@ -1,7 +1,6 @@
 {
   open Parser
 
-
   exception SyntaxError of string
 }
 
@@ -15,9 +14,11 @@ let up_letter = ['A'-'Z']
 let letter = ['a'-'z' 'A'-'Z']
 let id = (low_letter) (letter | digit | '_')*
 let atom = up_letter (letter | digit)+
+let comment = "//"
 
 rule read =
   parse
+  | comment           { Lexing.new_line lexbuf; read_comment lexbuf }
   | new_line          { Lexing.new_line lexbuf; read lexbuf }
   | white             { read lexbuf }
   | "*"               { MUL }
@@ -47,3 +48,8 @@ rule read =
   | "_"               { UNKNOWN }
   | eof               { EOF }
   | _                 { raise (SyntaxError ("Illegal string character: " ^ Lexing.lexeme lexbuf)) }
+and read_comment =
+  parse
+  | new_line          { Lexing.new_line lexbuf; read lexbuf }
+  | _                 { read_comment lexbuf }
+  | eof               { EOF }

@@ -21,10 +21,7 @@ let get_atom e = match e with
   | _ -> failwith "Expected Atom"
 
 
-let declare_system    e env =
-  let name = get_atom e in
-    (FuncOcaml (fun e env -> (e, env)), env)
-
+let declare_system    _ _ = failwith "c"
 let declare_component _ _ = failwith "c"
 let declare_entity    _ _ = failwith "e"
 

@@ -102,6 +102,7 @@ and call_func f arg env =
 
 and expr_to_env e1 e2 env =
   match (e1, e2) with
+  | Unknown, _ | _, Unknown -> env
   | e, Id id | Id id, e -> eval_var ({ name = Id id; value = e }, env) |> snd
   | Number a_num, Number f_num when a_num #= f_num -> env
   | Atom a_atom, Atom f_atom ->
@@ -129,20 +130,4 @@ and eval_dest ((e1, e2), env) = match (e1, e2) with
     let v = eval_id (id, env) |> fst in
     eval_dest ((v, e), env)
   | _, _ -> (a_false, env)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
