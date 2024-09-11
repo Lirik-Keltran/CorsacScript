@@ -1,4 +1,4 @@
-open Types
+(* open Types
 
 type command = { op : op_code; arg : int32 }
 
@@ -104,4 +104,4 @@ let program =
     ret 5l;
   |]
 
-let virt = create_vm program
+let virt = create_vm program *)

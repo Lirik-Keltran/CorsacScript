@@ -9,6 +9,8 @@ open Lexing
   let ast = Parser.prog Lexer.read lexbuf in
   eval ast Std.std *)
 
+let (>>) f g x = g(f(x));;
+
 let get_arg = Array.get (Sys.get_argv ())
 
 let print_position outx lexbuf =
@@ -27,8 +29,9 @@ let _ =
   let filename = try get_arg 1 with
   | Invalid_argument msg -> print_endline msg; exit (-1)
   in
+  let get_text_buf = In_channel.create >> Lexing.from_channel in
   let text = In_channel.create filename in
   let lexbuf = Lexing.from_channel text in
-  let () = Lexing.set_filename lexbuf filename in
+  let () = Lexing.set_filename (get_text_buf filename) filename in
   let ast = parse_with_error lexbuf in
     eval ast Std.std

@@ -1,8 +1,6 @@
 open AST
 open Utils
 
-
-
 type componen = {
   name: string;
   types: string Array.t;

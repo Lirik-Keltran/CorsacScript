@@ -1,34 +1,50 @@
 open AST
 open Utils
 
-type numbertype =
-  | Value of number
-  | UnknownValue
+type constructor = {
+  name: string;
+  args: exprtype array;
+}
 
-type corsactype =
-  | TUnknown of expr
-  | TTuple of corsactype Array.t
-  | TAtom of string
-  | TFunc of corsactype * corsactype
-  | TNumber of numbertype
-  | TAny
-  | TError
+and exprtype =
+  | Constructor of constructor
+  | Var of int
 
 (*
 
   (corsactype -> corsactype env.t) ->
 
 *)
+let create_tuple_type args = Constructor {
+  name = "Tuple";
+  args;
+}
 
-let rec get_type_env list_e env =
-  List.fold_left (fun acc e -> get_type_expr (e, acc) |> snd) env list_e
+let create_atom_type name = Constructor {
+  name = "Atom";
+  args = [| Constructor { name; args = [||] } |];
+}
 
-and get_type ((t, env): corsactype * corsactype Env.t) =
-  match t with
-  | TUnknown e -> get_type_expr (e, env)
-  | _ -> (t, env)
+let unknown_type = Constructor {
+  name = "Unknown";
+  args = [||];
+}
 
-and get_type_expr (e, env) = match e with
+(* Удалить потом *)
+let mut variables_counter = 0
+
+let rec unify type1 type2 env =
+  match type1, type2 with
+  | Constructor c1,
+    Constructor c2 ->
+    if c1.name <> c2.name
+      then failwith (c1.name ^ " -!- " ^ c2.name)
+    else if Array.length c1.args <> Array.length c2.args
+      then failwith ("Args size" ^ c1.name ^ " -!- " ^ c2.name)
+      else Array.map2 (fun arg1 arg2 -> unify arg1 arg2 env |> fst) c1.args c2.args
+  | _, _ -> failwith ""
+
+let rec get_type_expr ((e: expr), env) = match e with
   | Var v -> get_type_var (v, env)
   | Func f -> get_type_func (f, env)
   | FuncCall fc -> (get_type_funccall (fc, env) |> fst, env)
@@ -36,80 +52,39 @@ and get_type_expr (e, env) = match e with
   | Id id -> get_type_id (id, env)
   | Tuple t -> get_type_tuple (t, env)
   | Number n ->
-    let num = TNumber (Value n) in
+    let num_type = match n with
+    | Float _ -> "float"
+    | Int _ -> "int" in
+    let num = Constructor { name = num_type; args = [||]; }  in
       (num, env)
-  | FuncOcaml (name, _) -> get_type_id (name, env)
-  | Atom n -> (TAtom n, env)
-  | Unknown -> (TAny, env)
+  | FuncOcaml _ -> failwith ""
+  | Atom n -> (create_atom_type n, env)
+  | Unknown -> (unknown_type, env)
   | If (cond, e1, e2) -> get_type_if ((cond, e1, e2), env)
   | Dest (e1, e2) ->
     let t1, _ = get_type_expr (e1, env) in
     let t2, _ = get_type_expr (e2, env) in
     get_type_dest((t1, t2), env)
 
-and get_type_var (v, env) =  match (v.name, v.value) with
+and get_type_var (v, env) =
+  match (v.name, v.value) with
+  | _, Unknown -> failwith "Unknown cannot be used as a variable value"
   | Id id, value ->
-      let value_type, _ = get_type_expr (value, env) in
-      let env' = Env.add id value_type env in
-      (value_type, env')
-  | _ -> failwith "todo"
-
-
-and get_type_dest (t, env) = match t with
-  | TTuple t1, TTuple t2 ->
-      if Array.length t1 = Array.length t2 then
-        let res = unite_tuple t1 t2 in
-        let isSimular = Array.fold_left (fun acc (t1, t2) -> acc && type_is_simular t1 t2) true res
-        in
-          if isSimular
-            then (TAtom "True", tuple_to_env env res)
-            else (TAtom "False", env)
-      else
-        (TAtom "False", env)
-  | Id id, e | e, Id id ->
-    let v, _ = get_type_id (id, env) in
-    get_type_dest ((v, TUnknown e), env)
-  | _, _ -> (TAtom "False", env)
-
+      let e', _ = get_type_expr (value, env) in
+      (e', Env.add id e' env)
+  | Tuple t1, Tuple t2 ->
+    let type_t1 = get_type_tuple (t1, env) |> fst in
+    let _ = get_type_tuple (t2, env) |> fst in
+      (type_t1, env)
+  | e1, e2 -> failwith (print_expr e1 ^ " -- " ^ print_expr e2)
+and get_type_dest (_, _) = failwith ""
 and get_type_func (_, _) = failwith ""
 and get_type_funcall (_, _) = failwith ""
 and get_type_binop (_, _) = failwith ""
 and get_type_funccall (_, _) = failwith ""
 and get_type_id (_, _) = failwith ""
-and get_type_tuple (_, _) = failwith ""
+and get_type_tuple (t, env) =
+  let get_tuple_types e = get_type_expr (e, env) |> fst in
+  let tuple_type = Array.map get_tuple_types t |> create_tuple_type in
+  (tuple_type, env)
 and get_type_if (_, _) = failwith ""
-and expr_to_type e1 e2 env =
-  match (e1, e2) with
-    | Unknown, _ | _, Unknown -> TAny
-    | e, Id id | Id id, e -> get_type_var ({ name = Id id; value = e }, env) |> snd
-    | Number a_num, Number f_num when a_num #= f_num -> env
-    | Atom a_atom, Atom f_atom ->
-        if a_atom = f_atom then env
-        else
-          failwith ("Atoms error: " ^ a_atom ^ " and " ^ f_atom ^ " is not equal")
-    | Tuple t1, Tuple t2 -> unite_tuple t2 t1 |> tuple_to_env env
-    | e1, e2 -> failwith (print_expr e1 ^ " | " ^ print_expr e2)
-
-and tuple_to_env env args =
-  Array.fold_left (fun env' (f, a) -> expr_to_type a f env') env args
-
-and type_is_simular ty1 ty2 =
-  match (ty1, ty2) with
-    | TTuple t1, TTuple t2 ->
-      if Array.length t1 = Array.length t2
-        then
-          unite_tuple t1 t2
-          |> Array.fold_left (fun acc (e1, e2) -> acc && expr_is_simular e1 e2) true
-        else false
-    | _, TAny | TAny, _ -> true
-    | TAtom n1, TAtom n2 -> n1 = n2
-    | TNumber UnknownValue, TNumber _ | TNumber _, TNumber UnknownValue -> true
-    | _, _ -> ty1 = ty2
-
-and compare_type ty1 ty2 = failwith ""
-
-
-
-
-
-

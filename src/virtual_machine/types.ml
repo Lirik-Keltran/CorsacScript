@@ -1,3 +1,4 @@
+(*
 type op_code =
   | Push
   | PushVar
@@ -9,4 +10,4 @@ type op_code =
   | Goto
   | End
   | Call
-  | Ret
+  | Ret *)
