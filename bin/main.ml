@@ -1,5 +1,5 @@
 open Ast
-open Ast.Eval
+open Ast.Typecheck
 open Core
 open Lexing
 (* open Vm *)
@@ -34,4 +34,6 @@ let _ =
   let lexbuf = Lexing.from_channel text in
   let () = Lexing.set_filename (get_text_buf filename) filename in
   let ast = parse_with_error lexbuf in
-    eval ast Std.std
+    get_type ast |> print_type_env
+(*eval ast Std.std*)
+

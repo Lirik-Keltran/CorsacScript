@@ -2,7 +2,6 @@ some = v. (Some, v);
 none = None;
 
 some = v. (Some, v);
-none = None;
 
 map = f.o. o <> (Some, v) ? some (f v) : none;
 
@@ -21,8 +20,4 @@ c = mapPrint $ map (n. n == 0 ? Mda : n) $ mapRec $ condition (n. n >= 0);
 more = x.y. x > y;
 snd = (_, s). s;
 
-t = ;
-
-t (0, 1) |> print;
-
-
+print(c);
