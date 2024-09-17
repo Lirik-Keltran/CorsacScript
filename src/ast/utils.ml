@@ -75,13 +75,14 @@ let string_of_number n =
 let unite_tuple t1 t2 =
   Array.map2 (fun e1 e2 -> (e1, e2)) t1 t2
 
+
 let rec print_expr = function
   | If (cond, e1, e2) ->
       "|if|{" ^ print_expr cond ^ "?" ^ print_expr e1 ^ ":" ^ print_expr e2
       ^ "}"
-  | Id id -> "|id|" ^ id ^ ";"
+  | Id id -> "|id| " ^ id
   | Func f ->
-      "|fun|{ arg_name: " ^ print_expr f.arg_f ^ "; body" ^ print_expr f.body
+      "|fun|{ arg_name: " ^ print_expr f.arg_f ^ "; body: " ^ print_expr f.body
       ^ " }"
   | FuncCall fc ->
       "|call|{ caller: " ^ print_expr fc.caller ^ "; arg: " ^ print_expr fc.arg
@@ -141,5 +142,12 @@ let rec expr_is_simular e1 e2 =
     | _, Id _ -> true
     | Id _, _ -> true
     | e1, e2 -> compare_expr e1 e2
+
+
+let print_env_expr env = List.fold_left (fun acc expr -> acc  ^ print_expr expr) "" env
+
+
+
+
 
 

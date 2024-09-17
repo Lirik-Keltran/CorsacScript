@@ -74,7 +74,7 @@ and eval_funccall (fc, env) =
     | Some (Func f) -> Func f
     | Some (FuncOcaml f) -> FuncOcaml f
     | Some _ -> failwith (id ^ " have a type other than function")
-    | None -> failwith ("Not found function with name" ^ id)
+    | None -> failwith ("Not found function with name " ^ id)
   in
   let e, env' =
     match fc.caller with
